@@ -34,7 +34,7 @@ function load_script(script_name, onload)  {
     document.head.appendChild(script);
 }
 
-function create_modal(_id, _close_ID, text) {
+function create_modal(_id, text) {
     var mod = qsd("div");
     mod.id = _id;
     mod.className = "modal";
