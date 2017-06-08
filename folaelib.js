@@ -56,7 +56,8 @@ function create_modal(_id, text) {
         mod.style.display = "none";
     });
     //----
-    mod.appenChild = inter;
+    mod.appendChild = inter;
+    document.body.appendChild(mod);
 }
 
 var on = (function() {
