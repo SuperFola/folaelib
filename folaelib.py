@@ -492,7 +492,6 @@ if __name__ == '__main__':
 """
 if (not isinstance({code}, dict) and '{code}' not in aliases.keys()) or isinstance({code}, dict): _ = {code}
 else:
-    # print(type(aliases['{code}']))
     if type(aliases['{code}']).__name__ in ('function', 'builtin_function_or_method'): _ = aliases['{code}']()
     else: _ = aliases['{code}']
 print(_) if _ != None else 0
@@ -504,6 +503,7 @@ print(_) if _ != None else 0
                 except Exception as e2: Console.print(Console.Fore.RED, "[!] ", Console.Style.RESET_ALL, "{}: {}".format(exc_name(e2), e2))
     open('.folaelib.config', 'w').write(str(cfg))
 #
+
 
 
 

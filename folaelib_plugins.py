@@ -1,6 +1,25 @@
 import os
 
 
+def pull():
+    "git pull"
+    os.system("git pull")
+
+
+def push():
+    "git push"
+    os.system("git push")
+
+
+def commit(msg):
+    """
+    git add .
+    git commit -m MESSAGE
+    """
+    os.system("git add .")
+    os.system("git commit -m {}".format(msg))
+
+
 def stus():
     "git status -sb"
     os.system("git status -sb")
