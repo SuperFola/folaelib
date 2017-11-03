@@ -17,6 +17,10 @@ include = lambda m: _exec("{module} = __import__('{module}')".format(module=m))
 __create_fake_module = lambda m: _exec("class {module}: pass".format(module=m))
 __add_module_to_fake_module = lambda ms, m: _exec("class {ms}: pass\n{module}.{ms} = {ms}".format(ms=ms, module=m))
 
+def var_exists(name):
+    __exists = lambda m: _exec("try: {n} = True if {last} else True\nexcept NameError: {n} = False\nexcept: {n} = True".format(last=m, n="__lock_var_exists_or_not"))
+    __exists(name); return __lock_var_exists_or_not
+
 # not portable
 ext_libs = ['PIL.Image', 'pytesseract', 'msvcrt', 'getch']
 imported = []
@@ -25,7 +29,7 @@ for module in ext_libs:
         if '.' in module:
             prefix, *m = module.split('.'); prefixs = [prefix]
             if len(m) > 1: prefixs = [p for p in m[:-1]] + [prefix]
-            last = prefixs.pop(0); __create_fake_module(last)
+            last = prefixs.pop(0); __create_fake_module(last) if not var_exists(last) else 0
             for p in prefixs:
                 __add_module_to_fake_module(p, last); last = p
         include(module); imported.append(module)
@@ -105,20 +109,14 @@ Console.Style = colorama.Style
 
 
 def ls(directory=".", l=False, a=False, _n=20):
-    files = [f for f in os.listdir(directory) if f[0] != "."] if not a else os.listdir(directory)
+    files, suffixes = [f for f in os.listdir(directory) if f[0] != "."] if not a else os.listdir(directory), ["o", "Ko", "Mo", "Go", "To"]
     if l:
-        suffixes = ["o", "Ko", "Mo", "Go", "To"]
         Console.print("{:<28}  {:<8}    {:<8}    {}".format("Dir/file name", "Mode", "Type", "Size"))
         for name in files:
-            full_path = path.join(directory, name)
-            Console.print("{:<28}".format(name), end="  ")
-            inode = os.stat(full_path)
-            Console.print(Console.Fore.YELLOW, "{:<8}".format(str(inode.st_mode)), end="    ")
-            if path.isdir(full_path):
-                Console.print(Console.Fore.GREEN, "{:<8}".format("dir"), end="    ")
-            elif path.isfile(full_path):
-                Console.print(Console.Fore.CYAN, "{:<8}".format("file"), end="    ")
-            fsize, suffix = path.getsize(full_path), suffixes[0]
+            full_path, inode, fsize, suffix = path.join(directory, name), os.stat(full_path), path.getsize(full_path), suffixes[0]
+            Console.print("{:<28}".format(name), "  ", Console.Fore.YELLOW, "{:<8}".format(str(inode.st_mode)), end="    ")
+            if   path.isdir(full_path): Console.print(Console.Fore.GREEN, "{:<8}".format("dir"), end="    ")
+            elif path.isfile(full_path): Console.print(Console.Fore.CYAN, "{:<8}".format("file"), end="    ")
             while int(fsize) % 1024 and fsize / 1024 >= 1:
                 fsize /= 1024; suffix = suffixes[suffixes.index(suffix) + 1]
             Console.print(Console.Fore.YELLOW, "{:.1f} {}".format(fsize, suffix))
@@ -476,7 +474,7 @@ if __name__ == '__main__':
     ### My shell
     unimported = set(ext_libs) ^ set(imported)
     Console.print(Console.Fore.RED, "[!] ", Console.Style.RESET_ALL, "Could not import {}".format(", ".join(list(unimported)))) if unimported else 0
-    _exec("cfg = {}".format(open('.folaelib.config').read())) if path.exists('.folaelib.config') else {}
+    _exec("cfg = {}".format(open('.folaelib.config').read())) if path.exists('.folaelib.config') else 0; cfg = {} if not var_exists("cfg") else cfg
     content, aliases, _white_list_exc = [d for d in dir() if d not in imports and d[:2] != '__' and d[-2:] != '__'], {}, ('SyntaxError')
     while True:
         Console.print(*cfg.get('input', "$ "), end=" ")
@@ -506,6 +504,8 @@ print(_) if _ != None else 0
                 except Exception as e2: Console.print(Console.Fore.RED, "[!] ", Console.Style.RESET_ALL, "{}: {}".format(exc_name(e2), e2))
     open('.folaelib.config', 'w').write(str(cfg))
 #
+
+
 
 
 
