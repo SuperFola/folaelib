@@ -1,6 +1,11 @@
 import os
 
 
+def diff(file):
+    "git diff FILE"
+    os.system("git diff {}".format(file))
+
+
 def pull():
     "git pull"
     os.system("git pull")
@@ -31,12 +36,12 @@ def glog(n):
 
 
 def glogf(f):
-    "git log -p file"
+    "git log -p FILE"
     os.system("git log -p {}".format(f))
 
 
 def npp(f):
-    "'C:\\Program Files (x86)\\Notepad++\\notepad++.exe' file"
+    "'C:\\Program Files (x86)\\Notepad++\\notepad++.exe' FILE"
     os.system("'C:\\Program Files (x86)\\Notepad++\\notepad++.exe' {}".format(f))
 
 

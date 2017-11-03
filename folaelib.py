@@ -490,7 +490,8 @@ if __name__ == '__main__':
             try:
                 _exec(
 """
-if (not isinstance({code}, dict) and '{code}' not in aliases.keys()) or isinstance({code}, dict): _ = {code}
+__temp_code = {code}
+if (not isinstance(__temp_code, dict) and '{code}' not in aliases.keys()) or isinstance(__temp_code, dict): _ = __temp_code
 else:
     if type(aliases['{code}']).__name__ in ('function', 'builtin_function_or_method'): _ = aliases['{code}']()
     else: _ = aliases['{code}']
