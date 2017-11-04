@@ -113,7 +113,7 @@ def ls(directory=".", l=False, a=False, _n=20):
     if l:
         Console.print("{:<28}  {:<8}    {:<8}    {}".format("Dir/file name", "Mode", "Type", "Size"))
         for name in files:
-            full_path, inode, fsize, suffix = path.join(directory, name), os.stat(full_path), path.getsize(full_path), suffixes[0]
+            full_path = path.join(directory, name); inode, fsize, suffix = os.stat(full_path), path.getsize(full_path), suffixes[0]
             Console.print("{:<28}".format(name), "  ", Console.Fore.YELLOW, "{:<8}".format(str(inode.st_mode)), end="    ")
             if   path.isdir(full_path): Console.print(Console.Fore.GREEN, "{:<8}".format("dir"), end="    ")
             elif path.isfile(full_path): Console.print(Console.Fore.CYAN, "{:<8}".format("file"), end="    ")
@@ -470,12 +470,19 @@ class NeuralNet:
         print(l1)
 
 
+class _shexc(Exception): pass
+
+def _ls():  ls()
+def _lls(): ls(l=True)
+def _als(): ls(a=True, l=True)
+
+
 if __name__ == '__main__':
     ### My shell
     unimported = set(ext_libs) ^ set(imported)
     Console.print(Console.Fore.RED, "[!] ", Console.Style.RESET_ALL, "Could not import {}".format(", ".join(list(unimported)))) if unimported else 0
     _exec("cfg = {}".format(open('.folaelib.config').read())) if path.exists('.folaelib.config') else 0; cfg = {} if not var_exists("cfg") else cfg
-    content, aliases, _white_list_exc = [d for d in dir() if d not in imports and d[:2] != '__' and d[-2:] != '__'], {}, ('SyntaxError')
+    content, aliases, _white_list_exc = [d for d in dir() if d not in imports and d[:2] != '__' and d[-2:] != '__'], {}, ('SyntaxError', '_shexc')
     while True:
         Console.print(*cfg.get('input', "$ "), end=" ")
         cmd = input()
@@ -486,15 +493,17 @@ if __name__ == '__main__':
             "\t:q to quit", "\t:al to load aliases", "\t:as to save aliases",
             "\taliases is the dictionary containing your aliases (python lambda/function taking no arguments)",
             sep="\n")
-        elif len(cmd) and cmd[0]:
+        elif len(cmd):
             try:
                 _exec(
 """
-__temp_code = {code}
+try: __temp_code = {code}
+except NameError: __temp_code = None if '{code}' in aliases.keys() else _shexc
 if (not isinstance(__temp_code, dict) and '{code}' not in aliases.keys()) or isinstance(__temp_code, dict): _ = __temp_code
 else:
     if type(aliases['{code}']).__name__ in ('function', 'builtin_function_or_method'): _ = aliases['{code}']()
     else: _ = aliases['{code}']
+if __temp_code == _shexc: raise __temp_code
 print(_) if _ != None else 0
 """.format(code=cmd))
             except Exception as e1:
@@ -504,9 +513,3 @@ print(_) if _ != None else 0
                 except Exception as e2: Console.print(Console.Fore.RED, "[!] ", Console.Style.RESET_ALL, "{}: {}".format(exc_name(e2), e2))
     open('.folaelib.config', 'w').write(str(cfg))
 #
-
-
-
-
-
-
