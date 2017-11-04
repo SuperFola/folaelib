@@ -470,6 +470,8 @@ class NeuralNet:
         print(l1)
 
 
+## My Shell is below
+
 class _shexc(Exception): pass
 
 def _ls():  ls()
@@ -477,21 +479,41 @@ def _lls(): ls(l=True)
 def _als(): ls(a=True, l=True)
 
 
+def parse_shell_input_tip(L):
+    """
+    Just parsing all the special `codes` given by cfg["input"] -> list
+    to make something nice
+    """
+    if L is None: return ("$ ",)
+    else:
+        o = []
+        for e in L:
+            if   e == "time": o.append(time.strftime("%H:%M:%S"))
+            elif e == "curwd": o.append(os.getcwd())
+            else: o.append(e)
+        return o
+
+
 if __name__ == '__main__':
     ### My shell
-    unimported = set(ext_libs) ^ set(imported)
+    sh_dir, unimported = os.getcwd(), set(ext_libs) ^ set(imported)
     Console.print(Console.Fore.RED, "[!] ", Console.Style.RESET_ALL, "Could not import {}".format(", ".join(list(unimported)))) if unimported else 0
     _exec("cfg = {}".format(open('.folaelib.config').read())) if path.exists('.folaelib.config') else 0; cfg = {} if not var_exists("cfg") else cfg
     content, aliases, _white_list_exc = [d for d in dir() if d not in imports and d[:2] != '__' and d[-2:] != '__'], {}, ('SyntaxError', '_shexc')
     while True:
-        Console.print(*cfg.get('input', "$ "), end=" ")
+        Console.print(*parse_shell_input_tip(cfg.get('input', None)), end=" ")
         cmd = input()
         if   cmd.strip() == ":q": break
         elif cmd.strip() == ":al": aliases = {} if not path.exists('.folaelib.aliases') and not aliases else pickle.load(open('.folaelib.aliases', 'rb'))
         elif cmd.strip() == ":as": pickle.dump(aliases, open('.folaelib.aliases', 'wb'))
+        elif cmd.strip() == ":cl":
+            _exec("cfg = {}".format(open('.folaelib.config').read())) if path.exists('.folaelib.config') else 0; cfg = {} if not var_exists("cfg") else cfg
+        elif cmd.strip() == ":co": npp(path.join(sh_dir, ".folaelib.config"))
+        elif len(cmd) and cmd.strip()[0] == ":" and cmd.strip()[1:] in cfg.get("paths", {}).keys(): locate_and_cwd(*cfg["paths"][cmd.strip()[1:]])
         elif cmd == "help": print(
             "\t:q to quit", "\t:al to load aliases", "\t:as to save aliases",
             "\taliases is the dictionary containing your aliases (python lambda/function taking no arguments)",
+            "\t:cl to (re)load the config", "\t:co to open the config file in Npp",
             sep="\n")
         elif len(cmd):
             try:
@@ -511,5 +533,4 @@ print(_) if _ != None else 0
                     Console.print(Console.Fore.MAGENTA, "[!] ", Console.Style.RESET_ALL, "{}: {}".format(exc_name(e1), e1))
                 try: _exec(cmd)
                 except Exception as e2: Console.print(Console.Fore.RED, "[!] ", Console.Style.RESET_ALL, "{}: {}".format(exc_name(e2), e2))
-    open('.folaelib.config', 'w').write(str(cfg))
 #

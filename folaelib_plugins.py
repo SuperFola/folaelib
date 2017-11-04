@@ -69,7 +69,7 @@ def glogf(f):
 
 def npp(f):
     "'C:\\Program Files (x86)\\Notepad++\\notepad++.exe' FILE"
-    os.system("'C:\\Program Files (x86)\\Notepad++\\notepad++.exe' {}".format(f))
+    os.system("\"C:\\Program Files (x86)\\Notepad++\\notepad++.exe\" {}".format(f))
 
 
 def clear():
