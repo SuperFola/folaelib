@@ -5,4 +5,4 @@ The path to enter in your HTML code (to use the js/css lib only) begin with :
 
 Example :
 
-`<script type="text/javascript" src="https://cdn.rawgit.com/Loodoor/folaelib/master/folaelib.js"></script>`
+`<script type="text/javascript" src="https://cdn.jsdelivr.net/gh/Loodoor/folaelib/folaelib.js"></script>`
